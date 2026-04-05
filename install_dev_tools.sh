@@ -35,6 +35,7 @@ install_docker() {
         $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
     apt-get update -qq
     apt-get install -qq -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    usrermod -aG docker $SUDO_USER
 
     echo "Docker installation completed."
 }
@@ -42,7 +43,7 @@ install_docker() {
 # docker-compose
 
 install_docker_compose() {
-    if command -v docker compose &> /dev/null; then
+    if command docker compose version &> /dev/null; then
         echo "Docker Compose is already installed. Skipping installation."
         return
     fi
@@ -57,7 +58,7 @@ install_docker_compose() {
 # python3
 
 install_python3() {
-    if command -v python3 &> /dev/null; then
+    if command -v python3 &> /dev/null && python3 -c "import sys; exit(0) if sys.version_info >= (3, 9) else exit(1)"; then
         echo "Python 3 is already installed. Skipping installation."
         if ! python3 -m pip --version &> /dev/null; then
             echo "pip is not installed. Installing pip..."
