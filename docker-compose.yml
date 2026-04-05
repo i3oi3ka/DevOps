@@ -5,6 +5,11 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "${DB_PORT}:5432"
     volumes:
@@ -13,11 +18,12 @@ services:
     build: .
     command: >
       sh -c "python manage.py migrate && 
-             python manage.py runserver 0.0.0.0:8000"
+             gunicorn lesson4.wsgi:application --bind 0.0.0.0:8000 --workers 3"
     environment:
       SECRET_KEY: ${SECRET_KEY}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - .:/app
     ports:
