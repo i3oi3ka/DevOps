@@ -1,15 +1,20 @@
 # modules/ecr/ecr.tf
 
 resource "aws_ecr_repository" "main" {
-  name                 = "lesson-5-ecr"
+  name                 = var.ecr_name
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
-    scan_on_push = true
+    scan_on_push = var.scan_on_push
+  }
+
+  tags = {
+    Environment = "dev"
+    name        = var.ecr_name
   }
 }
 
-# Політика життєвого циклу — це ОКРЕМИЙ ресурс
+# Політика життєвого циклу
 resource "aws_ecr_lifecycle_policy" "main" {
   repository = aws_ecr_repository.main.name
 
