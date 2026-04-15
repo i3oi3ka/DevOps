@@ -50,17 +50,47 @@
 bucket_name        = "your-unique-bucket-name"
 table_name         = "your-unique-table-name"
 
-vpc_name           = "main-vpc"
-vpc_cidr_block     = "10.0.0.0/16"
-public_subnets     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-private_subnets    = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
-availability_zones = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+vpc_name           = "your-vpc-name"
+vpc_cidr_block     = "your-vpc-cidr-block"
+public_subnets     = ["your-public-subnet-1", "your-public-subnet-2", "your-public-subnet-3"]
+private_subnets    = ["your-private-subnet-1", "your-private-subnet-2", "your-private-subnet-3"]
+availability_zones = ["your-availability-zone-1", "your-availability-zone-2", "your-availability-zone-3"]
 
 ecr_name           = "your-ecr-repository-name"
 scan_on_push       = true
 ```
 
 ---
+
+## 🚀 Порядок першого розгортання (Bootstrapping)
+
+Оскільки проект використовує S3 для зберігання стану, який сам же і створює, перший запуск має відбуватися за наступним алгоритмом:
+
+1. **Тимчасове вимкнення бекенду**:
+   Закоментуйте весь вміст файлу `backend.tf`. Це змусить Terraform зберігати стан локально на вашому комп'ютері під час створення бакета.
+
+2. **Створення базових ресурсів**:
+   Виконайте ініціалізацію та застосуйте конфігурацію:
+
+   ```bash
+   terraform init
+   terraform apply
+   ```
+
+   _Terraform створить S3-бакет та DynamoDB-таблицю._
+
+3. **Активація віддаленого бекенду**:
+   Розкоментуйте вміст файлу `backend.tf` та внесіть відповідні значення в полях змінних.
+
+4. Тепер, коли бакет у хмарі вже існує, виконайте повторну ініціалізацію:
+
+   ```bash
+   terraform init
+   ```
+
+   _Terraform запитає: "Do you want to copy existing state to the new backend?". Введіть **yes**._
+
+Тепер ваш проект повністю перейшов на хмарне зберігання стану, і локальний файл `.tfstate` можна видалити.
 
 ## 🚀 Команди для керування інфраструктурою
 
