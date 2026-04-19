@@ -19,10 +19,12 @@
 - **`modules/s3-backend`**: Створює S3-бакет та DynamoDB таблицю для віддаленого збереження стану Terraform (`terraform.tfstate`) та механізму State Locking.
 - **`modules/vpc`**: Розгортає Virtual Private Cloud (VPC), публічні та приватні підмережі, Internet Gateway та таблиці маршрутизації.
 - **`modules/ecr`**: Створює репозиторій для Docker-образів з налаштуванням сканування на вразливості.
+- **`modules/eks`**: Розгортає кластер EKS та групу вузлів для запуску контейнеризованих додатків.
 - **`main.tf`**: Головний файл проєкту, де викликаються всі модулі.
 - **`variables.tf`**: Оголошення вхідних змінних для конфігурації модулів.
 - **`backend.tf`**: Конфігурація підключення до віддаленого S3-сховища.
 - **`outputs.tf`**: Опис вихідних даних для отримання ідентифікаторів створених ресурсів.
+- **`terraform.tfvars`**: Файл для зберігання значень змінних (не включений до репозиторію, створюється користувачем).
 
 ---
 
@@ -41,6 +43,13 @@
 | `availability_zones` | Список зон доступності для підмереж            | `list(string)` | [`eu-west-2a`, `eu-west-2b`, `eu-west-2c`]    |
 | `ecr_name`           | Назва ECR репозиторію                          | `string`       | `ruday-lesson-7-ecr-1101`                     |
 | `scan_on_push`       | Чи вмикати сканування образів при завантаженні | `bool`         | `true`                                        |
+| `region`             | Регіон для розгортання ресурсів                | `string`       | `eu-west-2`                                   |
+| `cluster_name`       | Назва EKS кластера                             | `string`       | `lesson-7-eks-cluster`                        |
+| `node_group_name`    | Назва групи вузлів EKS                         | `string`       | `lesson-7-node-group`                         |
+| `instance_type`      | Тип EC2 інстансу для вузлів EKS                | `string`       | `t2.micro`                                    |
+| `desired_size`       | Бажана кількість вузлів у групі EKS            | `number`       | `2`                                           |
+| `max_size`           | Максимальна кількість вузлів у групі EKS       | `number`       | `3`                                           |
+| `min_size`           | Мінімальна кількість вузлів у групі EKS        | `number`       | `1`                                           |
 
 ### Приклад конфігурації `terraform.tfvars`:
 
@@ -58,6 +67,16 @@ availability_zones = ["your-availability-zone-1", "your-availability-zone-2", "y
 
 ecr_name           = "your-ecr-repository-name"
 scan_on_push       = true
+
+region             = "your-aws-region"
+cluster_name       = "your-eks-cluster-name"
+subnet_ids        = ["your-subnet-id-1", "your-subnet-id-2", "your-subnet-id-3"]
+node_group_name    = "your-node-group-name"
+instance_type      = "your-ec2-instance-type"
+desired_size       = 2
+max_size           = 3
+min_size           = 1
+
 ```
 
 ---
@@ -119,6 +138,15 @@ scan_on_push       = true
 
 Після успішного виконання команди `terraform apply`, у термінал будуть виведені ключові дані:
 
+- **`s3_bucket_name`**: Назва створеного S3-бакета для збереження стану Terraform.
+- **`dynamodb_table_name`**: Назва створеної DynamoDB таблиці для блокування стану.
 - **`vpc_id`**: Унікальний ідентифікатор створеної віртуальної мережі.
+- **`public_subnet_ids`**: Список ідентифікаторів публічних підмереж.
+- **`private_subnet_ids`**: Список ідентифікаторів приватних підмереж.
+- **`internet_gateway_id`**: Ідентифікатор створеного Internet Gateway.
+- **`ecs_cluster_endpoint`**: URL-адреса API сервера EKS кластера для взаємодії з Kubernetes.
+- **`eks_cluaster_name`**: Назва створеного EKS кластера.
+- **`eks_node_role_arn`**: ARN ролі IAM, яка використовується вузлами EKS для взаємодії з іншими сервісами AWS.
 - **`ecr_repository_url`**: URL-адреса створеного репозиторію ECR для завантаження Docker-образів.
-- **`s3_bucket_name`**: Назва створеного S3-бакета, де зберігається файл стану інфраструктури.
+
+---

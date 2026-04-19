@@ -24,10 +24,11 @@ module "ecr" {
 
 module "eks" {
   source        = "./modules/eks"
-  cluster_name  = "eks-lesson-7"            # Назва кластера
+  cluster_name  = var.cluster_name          # Ім'я кластера
+  region        = var.region                # Назва кластера
   subnet_ids    = module.vpc.public_subnets # ID підмереж
-  instance_type = "t2.micro"                # Тип інстансів
-  desired_size  = 1                         # Бажана кількість нодів
-  max_size      = 2                         # Максимальна кількість нодів
-  min_size      = 1                         # Мінімальна кількість нодів
+  instance_type = var.instance_type         # Тип інстансів
+  desired_size  = var.desired_size          # Бажана кількість нoдів
+  max_size      = var.max_size              # Максимальна кількість нoдів
+  min_size      = var.min_size              # Мінімальна кількість нoдів
 }
