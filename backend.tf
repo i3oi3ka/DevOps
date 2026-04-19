@@ -7,5 +7,3 @@ terraform {
     encrypt        = true                                         # Шифрування файлу стейту
   }
 }
-
-# 
