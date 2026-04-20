@@ -68,10 +68,6 @@ variable "cluster_name" {
   default     = "lesson-7-eks-cluster"
 }
 
-variable "subnet_ids" {
-  description = "List of subnet IDs for the EKS cluster"
-  type        = list(string)
-}
 
 variable "node_group_name" {
   description = "Name of the node group"
@@ -80,7 +76,7 @@ variable "node_group_name" {
 
 variable "instance_type" {
   description = "EC2 instance type for the worker nodes"
-  default     = "t2.micro"
+  default     = "t3.micro"
 }
 
 variable "desired_size" {

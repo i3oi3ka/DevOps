@@ -1,6 +1,6 @@
-# AWS Infrastructure Deployment (Lesson 5)
+# AWS Infrastructure Deployment (Lesson 7)
 
-Цей проєкт реалізує розгортання модульної хмарної інфраструктури в AWS за допомогою Terraform. Він включає налаштування ізольованої мережі (VPC), сховища для Docker-образів (ECR) та віддаленого бекенду для безпечного зберігання стану.
+Цей проєкт реалізує розгортання модульної хмарної інфраструктури в AWS за допомогою Terraform. Він включає налаштування ізольованої мережі (VPC), сховища для Docker-образів (ECR), кластера Kubernetes (EKS) та віддаленого бекенду для безпечного зберігання стану.
 
 ## 🛠 Prerequisites (Підготовка)
 
@@ -8,7 +8,7 @@
 
 - **Terraform** (версії 1.0 або новішої).
 - **AWS CLI** (налаштований через команду `aws configure`).
-- Наявність IAM-користувача з достатніми правами доступу для створення ресурсів VPC, ECR, S3 та DynamoDB.
+- Наявність IAM-користувача з достатніми правами доступу для створення ресурсів VPC, ECR, EKS, S3 та DynamoDB.
 
 ---
 
@@ -46,7 +46,7 @@
 | `region`             | Регіон для розгортання ресурсів                | `string`       | `eu-west-2`                                   |
 | `cluster_name`       | Назва EKS кластера                             | `string`       | `lesson-7-eks-cluster`                        |
 | `node_group_name`    | Назва групи вузлів EKS                         | `string`       | `lesson-7-node-group`                         |
-| `instance_type`      | Тип EC2 інстансу для вузлів EKS                | `string`       | `t2.micro`                                    |
+| `instance_type`      | Тип EC2 інстансу для вузлів EKS                | `string`       | `t3.micro`                                    |
 | `desired_size`       | Бажана кількість вузлів у групі EKS            | `number`       | `2`                                           |
 | `max_size`           | Максимальна кількість вузлів у групі EKS       | `number`       | `3`                                           |
 | `min_size`           | Мінімальна кількість вузлів у групі EKS        | `number`       | `1`                                           |
@@ -70,13 +70,11 @@ scan_on_push       = true
 
 region             = "your-aws-region"
 cluster_name       = "your-eks-cluster-name"
-subnet_ids        = ["your-subnet-id-1", "your-subnet-id-2", "your-subnet-id-3"]
 node_group_name    = "your-node-group-name"
 instance_type      = "your-ec2-instance-type"
 desired_size       = 2
 max_size           = 3
 min_size           = 1
-
 ```
 
 ---
@@ -99,19 +97,17 @@ min_size           = 1
    _Terraform створить S3-бакет та DynamoDB-таблицю._
 
 3. **Активація віддаленого бекенду**:
-   Розкоментуйте вміст файлу `backend.tf` та внесіть відповідні значення в полях змінних.
-
-4. Тепер, коли бакет у хмарі вже існує, виконайте повторну ініціалізацію:
-
+   Розкоментуйте вміст файлу `backend.tf` та внесіть відповідні значення в полях змінних (якщо вони не підтягуються автоматично). Далі виконайте повторну ініціалізацію:
    ```bash
    terraform init
    ```
-
    _Terraform запитає: "Do you want to copy existing state to the new backend?". Введіть **yes**._
 
 Тепер ваш проект повністю перейшов на хмарне зберігання стану, і локальний файл `.tfstate` можна видалити.
 
-## 🚀 Команди для керування інфраструктурою
+---
+
+## ⚙️ Команди для керування інфраструктурою
 
 Для роботи з проєктом використовуйте стандартний робочий процес Terraform у кореневій директорії:
 
@@ -144,9 +140,7 @@ min_size           = 1
 - **`public_subnet_ids`**: Список ідентифікаторів публічних підмереж.
 - **`private_subnet_ids`**: Список ідентифікаторів приватних підмереж.
 - **`internet_gateway_id`**: Ідентифікатор створеного Internet Gateway.
-- **`ecs_cluster_endpoint`**: URL-адреса API сервера EKS кластера для взаємодії з Kubernetes.
-- **`eks_cluaster_name`**: Назва створеного EKS кластера.
+- **`eks_cluster_endpoint`**: URL-адреса API сервера EKS кластера для взаємодії з Kubernetes.
+- **`eks_cluster_name`**: Назва створеного EKS кластера.
 - **`eks_node_role_arn`**: ARN ролі IAM, яка використовується вузлами EKS для взаємодії з іншими сервісами AWS.
 - **`ecr_repository_url`**: URL-адреса створеного репозиторію ECR для завантаження Docker-образів.
-
----
