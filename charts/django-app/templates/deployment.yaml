@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-django
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: {{ .Release.Name }}-django
@@ -21,3 +20,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-config
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
