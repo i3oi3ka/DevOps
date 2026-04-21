@@ -12,4 +12,10 @@ output "eks_node_role_arn" {
   description = "IAM role ARN for EKS Worker Nodes"
   value       = aws_iam_role.nodes.arn
 }
+output "oidc_provider_arn" {
+  value = aws_iam_openid_connect_provider.oidc.arn
+}
 
+output "oidc_provider_url" {
+  value = aws_iam_openid_connect_provider.oidc.url
+}
