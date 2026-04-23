@@ -43,5 +43,18 @@ spec:
         }
       }
     }
+    stage('Deploy to EKS') {
+      steps {
+          container('jnlp') { // використовуємо стандартний агент, де є kubectl/helm
+              sh '''
+                  helm upgrade --install django-app ./charts/django-app \
+                  --set image.repository=$ECR_REGISTRY/$IMAGE_NAME \
+                  --set image.tag=$IMAGE_TAG \
+                  --namespace default
+              '''
+          }
+      }
+  }
   }
 }
+
