@@ -44,7 +44,7 @@ spec:
         }
       }
     }
-  }
+  
   stage('GitOps: Update Helm Tag') {
             steps {
                 container('git-tool') {
@@ -71,5 +71,6 @@ spec:
                 }
             }
         }
+  }
 }
 
