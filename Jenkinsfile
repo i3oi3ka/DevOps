@@ -32,7 +32,7 @@ spec:
     ECR_REGISTRY = "472639102006.dkr.ecr.eu-west-2.amazonaws.com"
     IMAGE_NAME   = "ruday-lesson-8-9-ecr-repository"
     IMAGE_TAG    = "${env.BUILD_NUMBER}"
-    REPO_URL       = "github.com/i3oi3ka/DevOps.git"
+    REPO_URL     = "github.com/i3oi3ka/DevOps.git"
   }
 
   stages {
@@ -67,6 +67,7 @@ spec:
                         git checkout lesson-4
 
                         # Оновлюємо тег у values.yaml
+                        cd charts
                         sed -i "s/tag: .*/tag: ${IMAGE_TAG}/g" values.yaml
 
                         # Пушимо зміни
