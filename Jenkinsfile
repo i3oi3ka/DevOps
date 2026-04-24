@@ -17,6 +17,13 @@ spec:
         - sleep
       args:
         - 99d
+    - name: git-tool
+      image: alpine/git:latest
+      imagePullPolicy: Always
+      command:
+        - sleep
+      args: 
+        - 99d
 """
     }
   }
