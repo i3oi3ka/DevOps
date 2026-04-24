@@ -68,7 +68,7 @@ spec:
 
                         # Оновлюємо тег у values.yaml
                         cd charts
-                        sed -i "s/tag: .*/tag: ${IMAGE_TAG}/g" values.yaml
+                        sed -i "s/tag: .*/tag: ${IMAGE_TAG}/g" django-app/values.yaml
 
                         # Пушимо зміни
                         git add values.yaml
