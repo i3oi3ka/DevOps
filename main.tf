@@ -26,7 +26,7 @@ module "eks" {
   source        = "./modules/eks"
   cluster_name  = var.cluster_name           # Ім'я кластера
   region        = var.region                 # Назва кластера
-  subnet_ids    = module.vpc.private_subnets # ID підмереж
+  subnet_ids    = module.vpc.private_subnets # ID приватних підмереж
   instance_type = var.instance_type          # Тип інстансів
   desired_size  = var.desired_size           # Бажана кількість нoдів
   max_size      = var.max_size               # Максимальна кількість нoдів
@@ -34,13 +34,20 @@ module "eks" {
 }
 
 data "aws_eks_cluster" "eks" {
-  name = var.cluster_name
+  name = module.eks.eks_cluster_name
+  depends_on = [
+    module.eks
+  ]
 }
 
 data "aws_eks_cluster_auth" "eks" {
-  name = var.cluster_name
+  name = module.eks.eks_cluster_name
+  depends_on = [
+    module.eks
+  ]
 }
 
+# Налаштування для Helm
 provider "helm" {
   kubernetes = {
     host                   = data.aws_eks_cluster.eks.endpoint
@@ -49,11 +56,32 @@ provider "helm" {
   }
 }
 
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.eks.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.eks.token
+}
+
 module "jenkins" {
-  source       = "./modules/jenkins"
-  cluster_name = module.eks.eks_cluster_name
+  source            = "./modules/jenkins"
+  cluster_name      = module.eks.eks_cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_provider_url = module.eks.oidc_provider_url
+  kubeconfig        = "~/.kube/config"
 
   providers = {
-    helm = helm
+    helm       = helm
+    kubernetes = kubernetes
   }
+
+  depends_on = [
+    module.eks
+  ]
+}
+
+
+module "argo_cd" {
+  source        = "./modules/argo_cd"
+  namespace     = var.namespace
+  chart_version = var.chart_version
 }

@@ -2,20 +2,20 @@
 variable "bucket_name" {
   description = "Назва S3 бакета для збереження стану Terraform"
   type        = string
-  default     = "terraform-state-bucket-lesson-7" # Можна змінити на унікальне ім'я
+  default     = "Ruday-terraform-state-bucket-devOps" # Можна змінити на унікальне ім'я
 }
 
 variable "table_name" {
   description = "Назва DynamoDB таблиці для блокування стану Terraform"
   type        = string
-  default     = "terraform-locks-lesson-7" # Можна змінити на унікальне ім'я
+  default     = "Ruday-terraform-locks-devOps" # Можна змінити на унікальне ім'я
 }
 
 # --- Змінні для VPC ---
 variable "vpc_name" {
   description = "Ім'я VPC"
   type        = string
-  default     = "lesson-7-vpc"
+  default     = "DevOps-vpc"
 }
 
 variable "vpc_cidr_block" {
@@ -47,7 +47,7 @@ variable "availability_zones" {
 variable "ecr_name" {
   description = "Назва ECR репозиторію"
   type        = string
-  default     = "lesson-7-ecr-repository"
+  default     = "DevOps-ecr-repository"
 }
 
 variable "scan_on_push" {
@@ -65,18 +65,18 @@ variable "region" {
 
 variable "cluster_name" {
   description = "Name of the EKS cluster"
-  default     = "lesson-7-eks-cluster"
+  default     = "DevOps-eks-cluster"
 }
 
 
 variable "node_group_name" {
   description = "Name of the node group"
-  default     = "lesson-7-node-group"
+  default     = "DevOps-node-group"
 }
 
 variable "instance_type" {
   description = "EC2 instance type for the worker nodes"
-  default     = "t3.micro"
+  default     = "t3.small"
 }
 
 variable "desired_size" {
@@ -92,4 +92,24 @@ variable "max_size" {
 variable "min_size" {
   description = "Minimum number of worker nodes"
   default     = 1
+}
+
+#  --- Змінні для Argo CD ---
+
+variable "name" {
+  description = "Назва Helm-релізу"
+  type        = string
+  default     = "argo-cd"
+}
+
+variable "namespace" {
+  description = "K8s namespace для Argo CD"
+  type        = string
+  default     = "argocd"
+}
+
+variable "chart_version" {
+  description = "Версія Argo CD чарта"
+  type        = string
+  default     = "9.5.4"
 }

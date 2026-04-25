@@ -1,40 +1,43 @@
-# AWS Infrastructure Deployment (Lesson 7)
+# 🚀 AWS End-to-End GitOps Infrastructure (Lesson 8-9)
 
-Цей проєкт реалізує розгортання модульної хмарної інфраструктури в AWS за допомогою Terraform. Він включає налаштування ізольованої мережі (VPC), сховища для Docker-образів (ECR), кластера Kubernetes (EKS) та віддаленого бекенду для безпечного зберігання стану.
-
-## 🛠 Prerequisites (Підготовка)
-
-Перед початком роботи переконайтеся, що у вас встановлено:
-
-- **Terraform** (версії 1.0 або новішої).
-- **AWS CLI** (налаштований через команду `aws configure`).
-- **kubectl** (для взаємодії з кластером Kubernetes).
-- **Helm** (для розгортання додатку).
-- Наявність IAM-користувача з достатніми правами доступу для створення ресурсів VPC, ECR, EKS, S3 та DynamoDB.
+Цей проєкт реалізує повний CI/CD цикл (GitOps) для Django-застосунку в хмарі AWS. Інфраструктура розгорнута за допомогою **Terraform**, автоматизація збірки — через **Jenkins**, а безперервна доставка — через **Argo CD**.
 
 ---
 
-## 🏗 Структура проєкту
+## 🏗 Архітектура та CI/CD процес
 
-Проєкт розділений на логічні модулі для забезпечення зручності керування ресурсами:
+Проєкт реалізує сучасний підхід **GitOps**:
 
-- **`modules/s3-backend`**: Створює S3-бакет та DynamoDB таблицю для віддаленого збереження стану Terraform (`terraform.tfstate`) та механізму State Locking.
-- **`modules/vpc`**: Розгортає Virtual Private Cloud (VPC), публічні та приватні підмережі, Internet Gateway та таблиці маршрутизації.
-- **`modules/ecr`**: Створює репозиторій для Docker-образів з налаштуванням сканування на вразливості.
-- **`modules/eks`**: Розгортає кластер EKS та групу вузлів для запуску контейнеризованих додатків.
-- **`main.tf`**: Головний файл проєкту, де викликаються всі модулі.
-- **`variables.tf`**: Оголошення вхідних змінних для конфігурації модулів.
-- **`backend.tf`**: Конфігурація підключення до віддаленого S3-сховища.
-- **`outputs.tf`**: Опис вихідних даних для отримання ідентифікаторів створених ресурсів.
-- **`terraform.tfvars`**: Файл для зберігання значень змінних (не включений до репозиторію, створюється користувачем).
+1. **Infrastructure as Code**: Весь кластер (VPC, EKS, ECR, S3 Backend) керується через Terraform.
+2. **Continuous Integration**: Jenkins у Kubernetes використовує **Kaniko** для збірки Docker-образів без доступу до Docker-сокету хоста (Docker-in-Docker/Docker-less).
+3. **Continuous Deployment**: Argo CD відстежує зміни в Helm-чарті та автоматично синхронізує стан кластера з Git.
 
-### Додаток (Helm Chart)
+---
 
-- **`charts/django-app/`**: Містить конфігурацію для розгортання:
-- **Deployment**: Запуск контейнерів з вашим Django-додатком.
-- **Service (LoadBalancer)**: Забезпечує публічний доступ до додатку з інтернету.
-- **ConfigMap**: Передача змінних середовища у контейнери.
-- **HPA (Horizontal Pod Autoscaler)**: Динамічне масштабування подів (від 2 до 6) при навантаженні процесора понад 70%.
+## 📁 Структура проєкту
+
+- **`main.tf`**, **`variables.tf`**, **`outputs.tf`**: Головні конфігураційні файли Terraform.
+- **`backend.tf`**: Налаштування віддаленого збереження стану в S3.
+- **`modules/`**:
+  - `s3-backend`: Створення S3 та DynamoDB для Remote State та State Locking.
+  - `vpc`: Мережева інфраструктура (Public/Private subnets, Internet Gateway, NAT).
+  - `ecr`: Репозиторій для зберігання Docker-образів.
+  - `eks`: Кластер Kubernetes та керовані групи вузлів (Managed Node Groups) + CSI Driver.
+  - `jenkins`: Розгортання Jenkins через Helm (з налаштованими Kubernetes Clouds та агентами).
+  - `argo_cd`: Розгортання Argo CD з використанням паттерну **App-of-Apps** (включає локальний чарт для автоматичного керування застосунками).
+- **`charts/django-app/`**: Helm-чарт вашого додатку (Deployment, Service LoadBalancer, HPA, ConfigMap).
+
+---
+
+## 🛠 Prerequisites (Підготовка)
+
+Перед початком роботи переконайтеся, що у вас встановлено та налаштовано:
+
+- **Terraform** (версії 1.0 або новішої)
+- **AWS CLI** (налаштований через команду `aws configure`)
+- **kubectl** (для взаємодії з кластером Kubernetes)
+- **Helm** (для роботи з чартами)
+- **GitHub Personal Access Token (PAT)** з правами на читання/запис у репозиторій.
 
 ---
 
@@ -42,24 +45,29 @@
 
 Проєкт підтримує гнучке налаштування через змінні. Оголошені наступні параметри:
 
-| Назва                | Опис                                           | Тип            | За замовчуванням                              |
-| :------------------- | :--------------------------------------------- | :------------- | :-------------------------------------------- |
-| `bucket_name`        | Назва S3 бакета для збереження стану Terraform | `string`       | `ruday-lesson-7-terraform-state-bucket-1101`  |
-| `table_name`         | Назва DynamoDB таблиці для блокування стану    | `string`       | `ruday-lesson-7-terraform-locks-1101`         |
-| `vpc_name`           | Ім'я VPC                                       | `string`       | `ruday-lesson-7-vpc-1101`                     |
-| `vpc_cidr_block`     | CIDR блок для VPC                              | `string`       | `10.0.0.0/16`                                 |
-| `public_subnets`     | Список CIDR блоків для публічних підмереж      | `list(string)` | [`10.0.1.0/24`, `10.0.2.0/24`, `10.0.3.0/24`] |
-| `private_subnets`    | Список CIDR блоків для приватних підмереж      | `list(string)` | [`10.0.4.0/24`, `10.0.5.0/24`, `10.0.6.0/24`] |
-| `availability_zones` | Список зон доступності для підмереж            | `list(string)` | [`eu-west-2a`, `eu-west-2b`, `eu-west-2c`]    |
-| `ecr_name`           | Назва ECR репозиторію                          | `string`       | `ruday-lesson-7-ecr-1101`                     |
-| `scan_on_push`       | Чи вмикати сканування образів при завантаженні | `bool`         | `true`                                        |
-| `region`             | Регіон для розгортання ресурсів                | `string`       | `eu-west-2`                                   |
-| `cluster_name`       | Назва EKS кластера                             | `string`       | `lesson-7-eks-cluster`                        |
-| `node_group_name`    | Назва групи вузлів EKS                         | `string`       | `lesson-7-node-group`                         |
-| `instance_type`      | Тип EC2 інстансу для вузлів EKS                | `string`       | `t3.micro`                                    |
-| `desired_size`       | Бажана кількість вузлів у групі EKS            | `number`       | `2`                                           |
-| `max_size`           | Максимальна кількість вузлів у групі EKS       | `number`       | `3`                                           |
-| `min_size`           | Мінімальна кількість вузлів у групі EKS        | `number`       | `1`                                           |
+| Назва                | Опис                                                  | Тип            | За замовчуванням                                |
+| :------------------- | :---------------------------------------------------- | :------------- | :---------------------------------------------- |
+| `bucket_name`        | Назва S3 бакета для збереження стану Terraform        | `string`       | `Ruday-terraform-state-bucket-devOps`           |
+| `table_name`         | Назва DynamoDB таблиці для блокування стану Terraform | `string`       | `Ruday-terraform-locks-devOps`                  |
+| `vpc_name`           | Ім'я VPC                                              | `string`       | `DevOps-vpc`                                    |
+| `vpc_cidr_block`     | CIDR блок для VPC                                     | `string`       | `10.0.0.0/16`                                   |
+| `public_subnets`     | Список CIDR блоків для публічних підмереж             | `list(string)` | `["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]` |
+| `private_subnets`    | Список CIDR блоків для приватних підмереж             | `list(string)` | `["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]` |
+| `availability_zones` | Список зон доступності для підмереж                   | `list(string)` | `["eu-west-2a", "eu-west-2b", "eu-west-2c"]`    |
+| `ecr_name`           | Назва ECR репозиторію                                 | `string`       | `DevOps-ecr-repository`                         |
+| `scan_on_push`       | Чи вмикати сканування образів при завантаженні        | `bool`         | `true`                                          |
+| `region`             | AWS region for deployment                             | `string`       | `eu-west-2`                                     |
+| `cluster_name`       | Name of the EKS cluster                               | `string`       | `DevOps-eks-cluster`                            |
+| `node_group_name`    | Name of the node group                                | `string`       | `DevOps-node-group`                             |
+| `instance_type`      | EC2 instance type for the worker nodes                | `string`       | `t3.small`                                      |
+| `desired_size`       | Desired number of worker nodes                        | `number`       | `2`                                             |
+| `max_size`           | Maximum number of worker nodes                        | `number`       | `3`                                             |
+| `min_size`           | Minimum number of worker nodes                        | `number`       | `1`                                             |
+| `name`               | Назва Helm-релізу Argo CD                             | `string`       | `argo-cd`                                       |
+| `namespace`          | K8s namespace для Argo CD                             | `string`       | `argocd`                                        |
+| `chart_version`      | Версія Argo CD чарта                                  | `string`       | `9.5.4`                                         |
+
+---
 
 ### Приклад конфігурації `terraform.tfvars`:
 
@@ -85,111 +93,126 @@ instance_type      = "your-ec2-instance-type"
 desired_size       = 2
 max_size           = 3
 min_size           = 1
+name               = "your-argo-cd-release-name"
+namespace          = "your-argo-cd-namespace"
+chart_version      = "your-argo-cd-chart-version"
 ```
 
----
+## 🚀 Порядок розгортання
 
-## 🚀 Порядок першого розгортання (Bootstrapping)
+### 1. Bootstrapping (Перший запуск інфраструктури)
 
-Оскільки проект використовує S3 для зберігання стану, який сам же і створює, перший запуск має відбуватися за наступним алгоритмом:
+Оскільки проєкт використовує S3 для збереження стану, який сам же і створює, перший запуск має відбуватися так:
 
-1. **Тимчасове вимкнення бекенду**:
-   Закоментуйте весь вміст файлу `backend.tf`. Це змусить Terraform зберігати стан локально на вашому комп'ютері під час створення бакета.
-
-2. **Створення базових ресурсів**:
-   Виконайте ініціалізацію та застосуйте конфігурацію:
-
+1. Закоментуйте весь вміст файлу `backend.tf`.
+2. Виконайте ініціалізацію та створення ресурсів:
    ```bash
    terraform init
    terraform apply
    ```
+3. Розкоментуйте `backend.tf`, впишіть туди назву створеного бакету та таблиці DynamoDB.
+4. Виконайте `terraform init` ще раз і погодьтеся на міграцію стейту в AWS (`yes`).
+5. Знову виконайте `terraform apply` для завершення розгортання всієї інфраструктури.
 
-   _Terraform створить S3-бакет та DynamoDB-таблицю._
+### 2. Секрети додатку (Kubernetes)
 
-3. **Активація віддаленого бекенду**:
-   Розкоментуйте вміст файлу `backend.tf` та внесіть відповідні значення в полях змінних (якщо вони не підтягуються автоматично). Далі виконайте повторну ініціалізацію:
+Підключення до EKS:
+
+```bash
+aws eks --region eu-west-2 update-kubeconfig --name DevOps-eks-cluster
+```
+
+Django вимагає обов'язковий `SECRET_KEY`. Для безпеки ми передаємо його через Kubernetes Secret, а не зберігаємо у Git:
+
+```bash
+kubectl create secret generic django-secrets \
+  --from-literal=SECRET_KEY='your-random-secret-key-here' \
+  --namespace default
+```
+
+### 3. Налаштування Jenkins
+
+Оскільки ми використовуємо підхід "Configuration as Code", облікові дані (`github-token`) створюються автоматично під час встановлення Helm-чарту.
+
+1. Перед розгортанням інфраструктури відкрийте файл конфігурації Jenkins (`modules/jenkins/values.yaml` або відповідний файл зі змінними).
+2. Знайдіть блок створення credentials і заповніть ваші дані:
+   - `username`: Ваш логін на GitHub.
+   - `password`: Ваш GitHub Personal Access Token (PAT).
+3. Для отримання посилання на load balancer Jenkins виконайте команду:
    ```bash
-   terraform init
+   kubectl get svc -n jenkins jenkins -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
    ```
-   _Terraform запитає: "Do you want to copy existing state to the new backend?". Введіть **yes**._
 
-Тепер ваш проект повністю перейшов на хмарне зберігання стану, і локальний файл `.tfstate` можна видалити.
+### 4. Налаштування Argo CD
 
-## ☸️ Розгортання додатку (Helm)
-
-Після успішного створення EKS-кластера та завантаження Docker-образу Django в ECR, перейдіть до розгортання додатку:
-
-### 1. Налаштування змінних (`values.yaml`)
-
-Перед запуском обов'язково відкрийте файл `charts/django-app/values.yaml` та внесіть ваші актуальні дані (адресу образу ECR та секретний ключ Django):
-
-```yaml
-image:
-  repository: repo/my-django-app
-  tag: latest
-
-config:
-  SECRET_KEY: "ваш-справжній-супер-секретний-ключ"
-  DEBUG: "True"
-```
-
-### 2. Встановлення чарта
-
-Виконайте команду встановлення у директорії з чартом:
+Argo CD автоматично розгортається та налаштовується модулем Terraform.
+Для отримання посилання на сервіс Argo CD виконайте команду:
 
 ```bash
-cd charts/django-app
-helm install django-app .
+kubectl get svc -n argocd argocd-server -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 ```
 
-_(Для оновлення існуючого релізу після внесення змін використовуйте `helm upgrade django-app .`)_
+- **Логін**: `admin`
+- **Пароль**: Отримайте з кластера командою:
+  ```bash
+  kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+  ```
 
-### 3. Отримання публічної адреси
+## 🔄 Як працює автоматизація (CI/CD Workflow)
 
-Щоб отримати доступ до вашого працюючого веб-додатку з інтернету, дізнайтеся адресу балансувальника навантаження (LoadBalancer):
-
-```bash
-kubectl get svc django-app-django
-```
-
-Скопіюйте значення зі стовпця `EXTERNAL-IP` та відкрийте його у браузері. _(Примітка: AWS може знадобитися 2-3 хвилини на створення балансувальника)._
+1. **Push**: Ви робите коміт у Git-репозиторій (зміни в коді Django).
+2. **Jenkins Build**: Jenkins автоматично виявляє зміни (через Poll SCM), запускає тимчасовий Pod у Kubernetes з контейнерами **Git** та **Kaniko**.
+3. **Build & Push**: Kaniko збирає новий Docker-образ і пушить його в Amazon ECR з унікальним тегом (номер білда `${BUILD_NUMBER}`).
+4. **GitOps Update (CD Trigger)**: Jenkins клонує репозиторій, змінює значення `tag:` у файлі `charts/django-app/values.yaml` на нове та робить `git push` назад у репозиторій.
+5. **Argo CD Sync**: Argo CD постійно сканує репозиторій. Побачивши новий тег у `values.yaml`, він ініціює синхронізацію і виконує Rolling Update подів Django у кластері без простою.
 
 ---
 
-## ⚙️ Команди для керування інфраструктурою
+## ⚙️ Команди для перевірки
 
-Для роботи з проєктом використовуйте стандартний робочий процес Terraform у кореневій директорії:
+- **Отримати URL вашого працюючого веб-додатку Django**:
 
-1. **Ініціалізація проєкту**:
-   ```bash
-   terraform init
-   ```
-2. **Перегляд плану інфраструктури**:
-   ```bash
-   terraform plan
-   ```
-3. **Розгортання інфраструктури**:
-   ```bash
-   terraform apply
-   ```
-4. **Видалення інфраструктури**:
-   ```bash
-   terraform destroy
-   ```
+  ```bash
+    kubectl get svc django-app-django -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+  ```
+
+- **Перевірити статуси подів додатку**:
+
+  ```bash
+  kubectl get pods -n default
+  ```
+
+- **Статус синхронізації Argo CD через CLI**:
+
+  ```bash
+  kubectl get applications -n argocd
+  ```
+
+- **Знищення всієї інфраструктури (Clean up)**:
+
+  ```bash
+  terraform destroy
+  ```
 
 ---
 
-## 📤 Вихідні дані (Outputs)
+## 📤 Outputs (Вихідні дані)
 
-Після успішного виконання команди `terraform apply`, у термінал будуть виведені ключові дані:
+Після завершення `terraform apply` ви отримаєте:
 
-- **`s3_bucket_name`**: Назва створеного S3-бакета для збереження стану Terraform.
-- **`dynamodb_table_name`**: Назва створеної DynamoDB таблиці для блокування стану.
-- **`vpc_id`**: Унікальний ідентифікатор створеної віртуальної мережі.
-- **`public_subnet_ids`**: Список ідентифікаторів публічних підмереж.
-- **`private_subnet_ids`**: Список ідентифікаторів приватних підмереж.
-- **`internet_gateway_id`**: Ідентифікатор створеного Internet Gateway.
-- **`eks_cluster_endpoint`**: URL-адреса API сервера EKS кластера для взаємодії з Kubernetes.
-- **`eks_cluster_name`**: Назва створеного EKS кластера.
-- **`eks_node_role_arn`**: ARN ролі IAM, яка використовується вузлами EKS для взаємодії з іншими сервісами AWS.
-- **`ecr_repository_url`**: URL-адреса створеного репозиторію ECR для завантаження Docker-образів.
+- `s3_bucket_name`: Назва S3-бакета для стейту.
+- `dynamodb_table_name`: Назва таблиці DynamoDB для блокування.
+- `vpc_id`: Ідентифікатор мережі.
+- `public_subnets`: Список публічних підмереж.
+- `private_subnets`: Список приватних підмереж.
+- `internet_gateway_id`: Ідентифікатор інтернет-шлюзу.
+- `eks_cluster_endpoint`: URL-адреса API сервера EKS.
+- `eks_cluster_name`: Ім'я кластера EKS.
+- `eks_node_role_arn`: ARN ролі для вузлів EKS.
+- `ecr_repository_url`: URL вашого ECR репозиторію.
+- `jenkins_release`: Назва релізу Jenkins.
+- `jenkins_namespace`: Простір імен для Jenkins.
+- `argo_cd_server_service`: URL-адреса сервісу Argo CD
+  `admin_password`: Пароль адміністратора Argo CD.
+
+---

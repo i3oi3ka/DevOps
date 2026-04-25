@@ -1,0 +1,29 @@
+applications:
+  - name: django-app
+    namespace: argocd
+    project: default
+    source:
+      repoURL: your-repo-url
+      path: charts/django-app
+      targetRevision: lesson-4
+      helm:
+        valueFiles:
+          - values.yaml
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: default
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+
+repositories:
+  - name: django-app
+    url: your-repo-url
+    # Do not store repository credentials in this values file.
+    # Provide authentication via a Kubernetes Secret or an external
+    # secret manager such as AWS Secrets Manager or HashiCorp Vault.
+
+repoConfig:
+  insecure: "true"
+  enableLfs: "true"

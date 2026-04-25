@@ -64,3 +64,14 @@ output "jenkins_release" {
 output "jenkins_namespace" {
   value = module.jenkins.jenkins_namespace
 }
+
+# ---------------Argo CD-----------------
+output "argo_cd_server_service" {
+  description = "Argo CD server service"
+  value       = "argo-cd.${var.namespace}.svc.cluster.local"
+}
+
+output "admin_password" {
+  description = "Argo CD admin password"
+  value       = module.argo_cd.admin_password
+}

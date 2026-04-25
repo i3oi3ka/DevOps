@@ -44,11 +44,13 @@ controller:
           system:
             domainCredentials:
               - credentials:
+                  # Do not hardcode GitHub tokens in this values file.
+                  # Provide GITHUB_USERNAME and GITHUB_TOKEN via Kubernetes/Terraform secret management.
                   - usernamePassword:
                       scope: GLOBAL
                       id: github-token
-                      username: 
-                      password: 
+                      username: ${GITHUB_USERNAME}
+                      password: ${GITHUB_TOKEN}
                       description: GitHub PAT
       seed-job: |
         jobs:
@@ -58,10 +60,10 @@ controller:
                 scm {
                   git {
                     remote {
-                      url('<https://github.com/AndriyDmitriv/infra.git>')
+                      url('YOUR_REPO_URL')
                       credentials('github-token')
                     }
-                    branches('*/main')
+                    branches('*/lesson-4')
                   }
                 }
                 steps {
@@ -73,10 +75,10 @@ controller:
                             scm {
                               git {
                                 remote {
-                                  url("<https://github.com/AndriyDmitriv/infra.git>")
+                                  url("YOUR_REPO_URL")
                                   credentials("github-token")
                                 }
-                                branches("*/main")
+                                branches("*/lesson-4")
                               }
                             }
                           }
