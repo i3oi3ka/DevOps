@@ -33,6 +33,8 @@ spec:
     IMAGE_NAME   = "ruday-lesson-8-9-ecr-repository"
     IMAGE_TAG    = "${env.BUILD_NUMBER}"
     REPO_URL     = "github.com/i3oi3ka/DevOps.git"
+    GIT_USER     = 'i3oi3ka'
+    GIT_EMAIL    = 'i3oi3ka@ukr.net'
   }
 
   stages {
