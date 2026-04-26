@@ -47,8 +47,8 @@
 
 | Назва                | Опис                                                  | Тип            | За замовчуванням                                |
 | :------------------- | :---------------------------------------------------- | :------------- | :---------------------------------------------- |
-| `bucket_name`        | Назва S3 бакета для збереження стану Terraform        | `string`       | `Ruday-terraform-state-bucket-devOps`           |
-| `table_name`         | Назва DynamoDB таблиці для блокування стану Terraform | `string`       | `Ruday-terraform-locks-devOps`                  |
+| `bucket_name`        | Назва S3 бакета для збереження стану Terraform        | `string`       | `ruday-terraform-state-bucket-devOps`           |
+| `table_name`         | Назва DynamoDB таблиці для блокування стану Terraform | `string`       | `ruday-terraform-locks-devOps`                  |
 | `vpc_name`           | Ім'я VPC                                              | `string`       | `DevOps-vpc`                                    |
 | `vpc_cidr_block`     | CIDR блок для VPC                                     | `string`       | `10.0.0.0/16`                                   |
 | `public_subnets`     | Список CIDR блоків для публічних підмереж             | `list(string)` | `["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]` |

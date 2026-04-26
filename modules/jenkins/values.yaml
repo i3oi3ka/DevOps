@@ -63,7 +63,7 @@ controller:
                       url('YOUR_REPO_URL')
                       credentials('github-token')
                     }
-                    branches('*/lesson-4')
+                    branches('*/main')
                   }
                 }
                 steps {
@@ -78,7 +78,7 @@ controller:
                                   url("YOUR_REPO_URL")
                                   credentials("github-token")
                                 }
-                                branches("*/lesson-4")
+                                branches("*/main")
                               }
                             }
                           }

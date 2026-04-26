@@ -2,13 +2,13 @@
 variable "bucket_name" {
   description = "Назва S3 бакета для збереження стану Terraform"
   type        = string
-  default     = "Ruday-terraform-state-bucket-devOps" # Можна змінити на унікальне ім'я
+  default     = "ruday-terraform-state-bucket-devOps" # Можна змінити на унікальне ім'я
 }
 
 variable "table_name" {
   description = "Назва DynamoDB таблиці для блокування стану Terraform"
   type        = string
-  default     = "Ruday-terraform-locks-devOps" # Можна змінити на унікальне ім'я
+  default     = "ruday-terraform-locks-devOps" # Можна змінити на унікальне ім'я
 }
 
 # --- Змінні для VPC ---
