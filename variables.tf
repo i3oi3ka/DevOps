@@ -113,3 +113,117 @@ variable "chart_version" {
   type        = string
   default     = "9.5.4"
 }
+
+
+# --- Змінні для RDS ---
+variable "rds_cluster_name" {
+  description = "Назва кластера RDS (для Aurora)"
+  type        = string
+  default     = "DevOps-rds-cluster"
+}
+
+variable "engine" {
+  type    = string
+  default = "postgres"
+}
+variable "engine_cluster" {
+  type    = string
+  default = "aurora-postgresql"
+}
+variable "aurora_replica_count" {
+  type    = number
+  default = 1
+}
+
+variable "aurora_instance_count" {
+  type    = number
+  default = 2 # 1 primary + 1 replica
+}
+variable "engine_version" {
+  type    = string
+  default = "17.2"
+}
+
+variable "instance_class" {
+  type    = string
+  default = "db.t3.small"
+}
+
+variable "allocated_storage" {
+  type    = number
+  default = 20
+}
+
+variable "db_name" {
+  type    = string
+  default = "devopsdb"
+}
+
+variable "username" {
+  type    = string
+  default = "postgres"
+}
+
+variable "password" {
+  description = "Пароль для БД. Має бути переданий через безпечний зовнішній механізм (наприклад, TF_VAR_password, secrets manager або .tfvars файл поза VCS)."
+  type        = string
+  sensitive   = true
+}
+
+variable "vpc_id" {
+  type = string
+}
+
+variable "subnet_private_ids" {
+  type = list(string)
+}
+
+variable "subnet_public_ids" {
+  type = list(string)
+}
+
+variable "publicly_accessible" {
+  type    = bool
+  default = false
+}
+
+variable "multi_az" {
+  type    = bool
+  default = true
+}
+
+variable "parameters" {
+  type = map(string)
+  default = {
+    max_connections            = "200"
+    log_min_duration_statement = "500"
+  }
+}
+
+variable "use_aurora" {
+  type    = bool
+  default = false
+}
+
+variable "backup_retention_period" {
+  type    = number
+  default = 7
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
+}
+
+variable "parameter_group_family_aurora" {
+  type    = string
+  default = "aurora-postgresql15"
+}
+variable "engine_version_cluster" {
+  type    = string
+  default = "15.3"
+}
+variable "parameter_group_family_rds" {
+  type    = string
+  default = "postgres15"
+}

@@ -85,3 +85,43 @@ module "argo_cd" {
   namespace     = var.namespace
   chart_version = var.chart_version
 }
+
+
+module "rds" {
+  source = "./modules/rds"
+
+  rds_cluster_name      = var.rds_cluster_name
+  use_aurora            = var.use_aurora
+  aurora_instance_count = var.aurora_instance_count
+
+  # --- Aurora-only ---
+  engine_cluster                = var.engine_cluster
+  engine_version_cluster        = var.engine_version_cluster
+  parameter_group_family_aurora = var.parameter_group_family_aurora
+
+  # --- RDS-only ---
+  engine                     = var.engine
+  engine_version             = var.engine_version
+  parameter_group_family_rds = var.parameter_group_family_rds
+
+  # common
+  instance_class          = var.instance_class
+  allocated_storage       = var.allocated_storage
+  db_name                 = var.db_name
+  username                = var.username
+  password                = var.password
+  subnet_private_ids      = module.vpc.private_subnets
+  subnet_public_ids       = module.vpc.public_subnets
+  publicly_accessible     = var.publicly_accessible
+  vpc_id                  = module.vpc.vpc_id
+  multi_az                = var.multi_az
+  backup_retention_period = var.backup_retention_period
+  parameters              = var.parameters
+
+  tags = {
+    Environment = "dev"
+    Project     = "lesson-db"
+  }
+}
+
+
