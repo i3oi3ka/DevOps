@@ -1,8 +1,6 @@
-# Subnet group (used by both)
-resource "aws_db_subnet_group" "default" {
-  name       = "${var.rds_cluster_name}-subnet-group"
-  subnet_ids = var.publicly_accessible ? var.subnet_public_ids : var.subnet_private_ids
-  tags       = var.tags
+# Отримуємо дані про VPC за її ID
+data "aws_vpc" "selected" {
+  id = var.vpc_id
 }
 
 # Security group (used by both)
@@ -11,11 +9,13 @@ resource "aws_security_group" "rds" {
   description = "Security group for RDS"
   vpc_id      = var.vpc_id
 
+  # Виправлений блок: дозволяємо доступ з усієї VPC
   ingress {
-    from_port = 5432
-    to_port   = 5432
-    protocol  = "tcp"
-    self      = true
+    description = "Allow PostgreSQL traffic from the VPC"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.selected.cidr_block]
   }
 
   egress {

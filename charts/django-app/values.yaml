@@ -1,6 +1,6 @@
 image:
   # Must be overridden via an environment-specific values file, `helm --set`, or Terraform-generated values before deployment.
-  repository: "472639102006.dkr.ecr.eu-west-2.amazonaws.com/ruday-lesson-db-ecr-repository"
+  repository: ""
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -13,7 +13,8 @@ ingress:
   enabled: false
 
 config:
-  POSTGRES_HOST: devops-rds-cluster.chsoyekactau.eu-west-2.rds.amazonaws.com
+  POSTGRES_HOST: ""
+  POSTGRES_PORT: "5432"
 
 secretEnv:
   POSTGRES_PASSWORD:

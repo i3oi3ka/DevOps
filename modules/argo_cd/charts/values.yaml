@@ -3,7 +3,7 @@ applications:
     namespace: argocd
     project: default
     source:
-      repoURL: https://github.com/i3oi3ka/DevOps.git
+      repoURL: "https://github.com/i3oi3ka/DevOps.git"
       path: charts/django-app
       targetRevision: lesson-db-module
       helm:
@@ -18,17 +18,17 @@ applications:
         prune: true
         selfHeal: true
 
-repositories:
-  - name: django-app
-    url: 472639102006.dkr.ecr.eu-west-2.amazonaws.com/ruday-lesson-db-ecr-repository
-    # Do not store repository credentials in this values file.
-    # Provide authentication via a Kubernetes Secret or an external
-    # secret manager such as AWS Secrets Manager or HashiCorp Vault.
+# repositories:
+#   - name: django-app
+#     url: "https://github.com/i3oi3ka/DevOps.git"
+#     # Do not store repository credentials in this values file.
+#     # Provide authentication via a Kubernetes Secret or an external
+#     # secret manager such as AWS Secrets Manager or HashiCorp Vault.
 
-repoConfig:
-  insecure: "true"
-  enableLfs: "true"
+# repoConfig:
+#   insecure: "true"
+#   enableLfs: "true"
 
-djangoApp:
-  postgresHost: "devops-rds-cluster.chsoyekactau.eu-west-2.rds.amazonaws.com"
-  postgresPort: "5432"
+# djangoApp:
+#   postgresHost: "devops-rds-cluster.chsoyekactau.eu-west-2.rds.amazonaws.com"
+#   postgresPort: "5432"

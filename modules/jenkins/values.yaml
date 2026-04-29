@@ -75,16 +75,13 @@ controller:
                       url('https://github.com/i3oi3ka/DevOps.git')
                       credentials('github-token')
                     }
-                    branches('*/lesson-db-module')
+                    branches('*/lesson-4')
                   }
                 }
                 steps {
                   dsl {
                     text('''
                       pipelineJob("goit-django-docker") {
-                        triggers {
-                          pollSCM("H/5 * * * *")
-                        }
                         definition {
                           cpsScm {
                             scm {
@@ -93,7 +90,7 @@ controller:
                                   url("https://github.com/i3oi3ka/DevOps.git")
                                   credentials("github-token")
                                 }
-                                branches("*/lesson-db-module")
+                                branches("*/lesson-4")
                               }
                             }
                             scriptPath("Jenkinsfile")

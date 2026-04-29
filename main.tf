@@ -85,6 +85,10 @@ resource "kubernetes_secret_v1" "django_secret" {
   }
 
   type = "Opaque"
+
+  depends_on = [
+    module.argo_cd
+  ]
 }
 
 module "jenkins" {
