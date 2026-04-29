@@ -1,4 +1,4 @@
-# 🚀 AWS End-to-End GitOps Infrastructure (Lesson 8-9)
+# 🚀 AWS End-to-End GitOps Infrastructure
 
 Цей проєкт реалізує повний CI/CD цикл (GitOps) для Django-застосунку в хмарі AWS. Інфраструктура розгорнута за допомогою **Terraform**, автоматизація збірки — через **Jenkins**, а безперервна доставка — через **Argo CD**.
 
@@ -25,6 +25,7 @@
   - `eks`: Кластер Kubernetes та керовані групи вузлів (Managed Node Groups) + CSI Driver.
   - `jenkins`: Розгортання Jenkins через Helm (з налаштованими Kubernetes Clouds та агентами).
   - `argo_cd`: Розгортання Argo CD з використанням паттерну **App-of-Apps** (включає локальний чарт для автоматичного керування застосунками).
+  - `rds`: Модуль для розгортання бази даних RDS (опціонально Aurora).
 - **`charts/django-app/`**: Helm-чарт вашого додатку (Deployment, Service LoadBalancer, HPA, ConfigMap).
 
 ---
@@ -66,6 +67,16 @@
 | `name`               | Назва Helm-релізу Argo CD                             | `string`       | `argo-cd`                                       |
 | `namespace`          | K8s namespace для Argo CD                             | `string`       | `argocd`                                        |
 | `chart_version`      | Версія Argo CD чарта                                  | `string`       | `9.5.4`                                         |
+| `use_aurora`         | Вибір типу БД: `true` (Aurora), `false` (RDS)         | `bool`         | `false`                                         |
+| `rds_cluster_name`   | Назва кластера/інстанса БД                            | `string`       | `null` / обов'язково                            |
+| `engine`             | Рушій для звичайної RDS                               | `string`       | `postgres`                                      |
+| `engine_cluster`     | Рушій для Aurora                                      | `string`       | `aurora-postgresql`                             |
+| `engine_version`     | Версія рушія БD                                       | `string`       | `17.9` (для RDS), `15.8` (для Aurora)           |
+| `instance_class`     | Клас інстансу БD                                      | `string`       | `db.t3.micro`                                   |
+| `db_name`            | Основна назва бази даних                              | `string`       | `null` / обов'язково                            |
+| `username`           | Головний користувач БД (Master username)              | `string`       | `null` / обов'язково                            |
+| `password`           | Пароль користувача БD                                 | `string`       | `null` / обов'язково                            |
+| `multi_az`           | Підтримка Multi-AZ                                    | `bool`         | `false`                                         |
 
 ---
 
@@ -96,7 +107,60 @@ min_size           = 1
 name               = "your-argo-cd-release-name"
 namespace          = "your-argo-cd-namespace"
 chart_version      = "your-argo-cd-chart-version"
+
+# Конфігурація для БД (RDS/Aurora)
+use_aurora         = false
+rds_cluster_name   = "my-app-db"
+engine             = "postgres"
+engine_version     = "17.9"
+instance_class     = "db.t3.micro"
+db_name            = "mydatabase"
+username           = "dbadmin"
+password           = "SuperSecretPassword123!"
 ```
+
+## 🗄️ Модуль `rds` (База Даних)
+
+Модуль надає універсальне рішення:
+
+- `use_aurora = true` → Створює кластер **AWS Aurora** (Cluster + Writer Instance + опціонально Readers).
+- `use_aurora = false` → Створює звичайний інстанс БД **AWS RDS** (Single/Multi-AZ).
+
+В обох варіантах автоматично:
+
+- Створюється `aws_db_subnet_group` у приватних підмережах VPC.
+- Налаштовується `aws_security_group` для доступу до БД.
+- Створюється Parameter Group із базовими налаштуваннями (`max_connections`, `log_statement`, `work_mem`, тощо).
+
+### Приклад використання модуля
+
+```hcl
+module "rds" {
+  source = "./modules/rds"
+
+  vpc_id              = module.vpc.vpc_id
+  vpc_cidr_block      = module.vpc.vpc_cidr_block
+  subnet_private_ids  = module.vpc.private_subnets_id
+  subnet_public_ids   = module.vpc.public_subnets_id
+
+  use_aurora          = false
+  rds_cluster_name    = var.rds_cluster_name
+  engine              = var.engine
+  engine_version      = var.engine_version
+  instance_class      = var.instance_class
+  db_name             = var.db_name
+  username            = var.username
+  password            = var.password
+  multi_az            = var.multi_az
+  publicly_accessible = var.publicly_accessible
+}
+```
+
+**Як змінити тип БД або параметри:**
+
+- Для переходу на Aurora змініть значення `use_aurora = true`. Якщо не змінювати детальних параметрів (engine, engine_version), модуль використає вбудовані дефолти: `aurora-postgresql` та `15.8` відповідно.
+- Тип машини можна змінити у змінній `instance_class` (наприклад, `db.t3.medium`).
+- Якщо потрібен MySQL замість PostgreSQL, вкажіть відповідні рушії `engine="mysql"` і `engine_version="8.0"`.
 
 ## 🚀 Порядок розгортання
 
@@ -213,6 +277,10 @@ kubectl get svc -n argocd argocd-server -o jsonpath='{.status.loadBalancer.ingre
 - `jenkins_release`: Назва релізу Jenkins.
 - `jenkins_namespace`: Простір імен для Jenkins.
 - `argo_cd_server_service`: URL-адреса сервісу Argo CD
-  `admin_password`: Пароль адміністратора Argo CD.
+- `admin_password`: Пароль адміністратора Argo CD.
+- `rds_endpoint`: Ендпойнт розгорнутої бази даних (стандартної RDS або Aurora).
+- `rds_port`: Порт для підключення до бази даних.
+- `rds_database_name`: Назва створеної бази даних (`db_name`).
+- `db_security_group_id`: ID створеної Security Group для бази даних.
 
 ---
