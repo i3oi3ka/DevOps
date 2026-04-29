@@ -1,6 +1,6 @@
 image:
   repository: 472639102006.dkr.ecr.eu-west-2.amazonaws.com/ruday-lesson-8-9-ecr-repository
-  tag: 6
+  tag: 7
   pullPolicy: IfNotPresent
 
 service:
