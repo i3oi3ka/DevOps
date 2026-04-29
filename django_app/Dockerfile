@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY django_app/requirements.txt .
 
 # Встановлюємо залежності оптимізовано
 RUN apk add --no-cache postgresql-libs && \
@@ -14,7 +14,7 @@ RUN apk add --no-cache postgresql-libs && \
     pip install --no-cache-dir -r requirements.txt && \
     apk --purge del .build-deps
 
-COPY . .
+COPY django_app/ .
 
 # Створюємо користувача без прав root для безпеки (Best Practice для Kubernetes)
 RUN adduser -D django_user && \
