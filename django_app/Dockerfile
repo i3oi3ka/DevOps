@@ -25,4 +25,6 @@ USER django_user
 
 EXPOSE 8000
 
+RUN python manage.py collectstatic --noinput
+
 CMD ["gunicorn", "django_app.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
