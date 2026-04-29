@@ -46,37 +46,40 @@
 
 Проєкт підтримує гнучке налаштування через змінні. Оголошені наступні параметри:
 
-| Назва                | Опис                                                  | Тип            | За замовчуванням                                |
-| :------------------- | :---------------------------------------------------- | :------------- | :---------------------------------------------- |
-| `bucket_name`        | Назва S3 бакета для збереження стану Terraform        | `string`       | `ruday-terraform-state-bucket-devOps`           |
-| `table_name`         | Назва DynamoDB таблиці для блокування стану Terraform | `string`       | `ruday-terraform-locks-devOps`                  |
-| `vpc_name`           | Ім'я VPC                                              | `string`       | `DevOps-vpc`                                    |
-| `vpc_cidr_block`     | CIDR блок для VPC                                     | `string`       | `10.0.0.0/16`                                   |
-| `public_subnets`     | Список CIDR блоків для публічних підмереж             | `list(string)` | `["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]` |
-| `private_subnets`    | Список CIDR блоків для приватних підмереж             | `list(string)` | `["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]` |
-| `availability_zones` | Список зон доступності для підмереж                   | `list(string)` | `["eu-west-2a", "eu-west-2b", "eu-west-2c"]`    |
-| `ecr_name`           | Назва ECR репозиторію                                 | `string`       | `DevOps-ecr-repository`                         |
-| `scan_on_push`       | Чи вмикати сканування образів при завантаженні        | `bool`         | `true`                                          |
-| `region`             | AWS region for deployment                             | `string`       | `eu-west-2`                                     |
-| `cluster_name`       | Name of the EKS cluster                               | `string`       | `DevOps-eks-cluster`                            |
-| `node_group_name`    | Name of the node group                                | `string`       | `DevOps-node-group`                             |
-| `instance_type`      | EC2 instance type for the worker nodes                | `string`       | `t3.small`                                      |
-| `desired_size`       | Desired number of worker nodes                        | `number`       | `2`                                             |
-| `max_size`           | Maximum number of worker nodes                        | `number`       | `3`                                             |
-| `min_size`           | Minimum number of worker nodes                        | `number`       | `1`                                             |
-| `name`               | Назва Helm-релізу Argo CD                             | `string`       | `argo-cd`                                       |
-| `namespace`          | K8s namespace для Argo CD                             | `string`       | `argocd`                                        |
-| `chart_version`      | Версія Argo CD чарта                                  | `string`       | `9.5.4`                                         |
-| `use_aurora`         | Вибір типу БД: `true` (Aurora), `false` (RDS)         | `bool`         | `false`                                         |
-| `rds_cluster_name`   | Назва кластера/інстанса БД                            | `string`       | `null` / обов'язково                            |
-| `engine`             | Рушій для звичайної RDS                               | `string`       | `postgres`                                      |
-| `engine_cluster`     | Рушій для Aurora                                      | `string`       | `aurora-postgresql`                             |
-| `engine_version`     | Версія рушія БD                                       | `string`       | `17.9` (для RDS), `15.8` (для Aurora)           |
-| `instance_class`     | Клас інстансу БD                                      | `string`       | `db.t3.micro`                                   |
-| `db_name`            | Основна назва бази даних                              | `string`       | `null` / обов'язково                            |
-| `username`           | Головний користувач БД (Master username)              | `string`       | `null` / обов'язково                            |
-| `password`           | Пароль користувача БD                                 | `string`       | `null` / обов'язково                            |
-| `multi_az`           | Підтримка Multi-AZ                                    | `bool`         | `false`                                         |
+| Назва                | Опис                                                            | Тип            | За замовчуванням                                |
+| :------------------- | :-------------------------------------------------------------- | :------------- | :---------------------------------------------- |
+| `bucket_name`        | Назва S3 бакета для збереження стану Terraform                  | `string`       | `ruday-terraform-state-bucket-devOps`           |
+| `table_name`         | Назва DynamoDB таблиці для блокування стану Terraform           | `string`       | `ruday-terraform-locks-devOps`                  |
+| `vpc_name`           | Ім'я VPC                                                        | `string`       | `DevOps-vpc`                                    |
+| `vpc_cidr_block`     | CIDR блок для VPC                                               | `string`       | `10.0.0.0/16`                                   |
+| `public_subnets`     | Список CIDR блоків для публічних підмереж                       | `list(string)` | `["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]` |
+| `private_subnets`    | Список CIDR блоків для приватних підмереж                       | `list(string)` | `["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]` |
+| `availability_zones` | Список зон доступності для підмереж                             | `list(string)` | `["eu-west-2a", "eu-west-2b", "eu-west-2c"]`    |
+| `ecr_name`           | Назва ECR репозиторію                                           | `string`       | `DevOps-ecr-repository`                         |
+| `scan_on_push`       | Чи вмикати сканування образів при завантаженні                  | `bool`         | `true`                                          |
+| `region`             | AWS region for deployment                                       | `string`       | `eu-west-2`                                     |
+| `cluster_name`       | Name of the EKS cluster                                         | `string`       | `DevOps-eks-cluster`                            |
+| `node_group_name`    | Name of the node group                                          | `string`       | `DevOps-node-group`                             |
+| `instance_type`      | EC2 instance type for the worker nodes                          | `string`       | `t3.small`                                      |
+| `desired_size`       | Desired number of worker nodes                                  | `number`       | `2`                                             |
+| `max_size`           | Maximum number of worker nodes                                  | `number`       | `3`                                             |
+| `min_size`           | Minimum number of worker nodes                                  | `number`       | `1`                                             |
+| `name`               | Назва Helm-релізу Argo CD                                       | `string`       | `argo-cd`                                       |
+| `namespace`          | K8s namespace для Argo CD                                       | `string`       | `argocd`                                        |
+| `chart_version`      | Версія Argo CD чарта                                            | `string`       | `9.5.4`                                         |
+| `use_aurora`         | Вибір типу БД: `true` (Aurora), `false` (RDS)                   | `bool`         | `false`                                         |
+| `rds_cluster_name`   | Назва кластера/інстанса БД                                      | `string`       | `null` / обов'язково                            |
+| `engine`             | Рушій для звичайної RDS                                         | `string`       | `postgres`                                      |
+| `engine_cluster`     | Рушій для Aurora                                                | `string`       | `aurora-postgresql`                             |
+| `engine_version`     | Версія рушія БD                                                 | `string`       | `17.9` (для RDS), `15.8` (для Aurora)           |
+| `instance_class`     | Клас інстансу БD                                                | `string`       | `db.t3.micro`                                   |
+| `db_name`            | Основна назва бази даних                                        | `string`       | `null` / обов'язково                            |
+| `username`           | Головний користувач БД (Master username)                        | `string`       | `null` / обов'язково                            |
+| `password`           | Пароль користувача БD                                           | `string`       | `null` / обов'язково                            |
+| `multi_az`           | Підтримка Multi-AZ                                              | `bool`         | `false`                                         |
+| `github_username`    | Ваш логін на GitHub для Jenkins credentials                     | `string`       | `null` / обов'язково                            |
+| `github_token`       | Ваш GitHub Personal Access Token для Jenkins                    | `string`       | `null` / обов'язково                            |
+| `django_secret_key`  | Секретний ключ для Django (передається через Kubernetes Secret) | `string`       | `null` / обов'язково                            |
 
 ---
 
@@ -107,6 +110,10 @@ min_size           = 1
 name               = "your-argo-cd-release-name"
 namespace          = "your-argo-cd-namespace"
 chart_version      = "your-argo-cd-chart-version"
+
+django_secret_key = "your-django-secret-key"
+github_username  = "your-github-username"
+github_token     = "your-github-personal-access-token"
 
 # Конфігурація для БД (RDS/Aurora)
 use_aurora         = false
