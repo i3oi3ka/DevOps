@@ -1,4 +1,10 @@
-# Отримуємо дані про VPC за її ID
+# Subnet group (used by both) - ЦЕ ТОЙ БЛОК, ЯКИЙ ЗНИК
+resource "aws_db_subnet_group" "default" {
+  name       = "${var.rds_cluster_name}-subnet-group"
+  subnet_ids = var.publicly_accessible ? var.subnet_public_ids : var.subnet_private_ids
+  tags       = var.tags
+}
+
 data "aws_vpc" "selected" {
   id = var.vpc_id
 }
