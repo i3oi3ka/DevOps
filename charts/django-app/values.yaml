@@ -1,6 +1,6 @@
 image:
   # Must be overridden via an environment-specific values file, `helm --set`, or Terraform-generated values before deployment.
-  repository: "REPLACE_ME"
+  repository: "472639102006.dkr.ecr.eu-west-2.amazonaws.com/ruday-lesson-db-ecr-repository"
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -13,15 +13,26 @@ ingress:
   enabled: false
 
 config:
-  POSTGRES_DB: django_db
-  POSTGRES_USER: django_user
   POSTGRES_HOST: localhost
-  POSTGRES_PORT: 5432
 
 secretEnv:
   POSTGRES_PASSWORD:
-    secretName: django-db-secret
+    secretName: django-secret
     secretKey: POSTGRES_PASSWORD
+  SECRET_KEY:
+    secretName: django-secret
+    secretKey: SECRET_KEY
+  POSTGRES_DB:
+    secretName: django-secret
+    secretKey: POSTGRES_DB
+  POSTGRES_USER:
+    secretName: django-secret
+    secretKey: POSTGRES_USER
+waitForDatabase:
+  enabled: true
+  image: postgres:16-alpine
+  intervalSeconds: 5
+
 autoscaling:
   enabled: true
   minReplicas: 2

@@ -19,7 +19,13 @@ resource "helm_release" "argo_apps" {
   create_namespace = false
 
   values = [
-    file("${path.module}/values.yaml")
+    file("${path.module}/charts/values.yaml"),
+    yamlencode({
+      djangoApp = {
+        postgresHost = var.django_postgres_host
+        postgresPort = tostring(var.django_postgres_port)
+      }
+    })
   ]
   depends_on = [helm_release.argo_cd]
 }

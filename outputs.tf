@@ -75,3 +75,19 @@ output "admin_password" {
   description = "Argo CD admin password"
   value       = module.argo_cd.admin_password
 }
+
+# ---------------RDS-----------------
+output "postgres_host" {
+  description = "PostgreSQL host endpoint without port."
+  value       = module.rds.db_host
+}
+
+output "postgres_port" {
+  description = "PostgreSQL port."
+  value       = module.rds.db_port
+}
+
+output "postgres_endpoint" {
+  description = "PostgreSQL endpoint with port."
+  value       = module.rds.db_endpoint
+}

@@ -30,7 +30,7 @@ spec:
 
   environment {
     ECR_REGISTRY = "472639102006.dkr.ecr.eu-west-2.amazonaws.com"
-    IMAGE_NAME   = "ruday-lesson-8-9-ecr-repository"
+    IMAGE_NAME   = "ruday-lesson-db-ecr-repository"
     IMAGE_TAG    = "${env.BUILD_NUMBER}"
     REPO_URL     = "github.com/i3oi3ka/DevOps.git"
   }
@@ -55,7 +55,6 @@ spec:
   stage('GitOps: Update Helm Tag') {
             steps {
                 container('git-tool') {
-                    // Використовуємо id: github-token, який ти створив у values.yaml
                     withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                         sh """
                         git config --global user.email "jenkins@neovercity.com"
@@ -64,7 +63,7 @@ spec:
                         # Клонуємо репозиторій (той самий або інший, де лежать values.yaml чарту)
                         git clone https://${GIT_USER}:${GIT_PASS}@${REPO_URL} config-repo
                         cd config-repo
-                        git checkout lesson-4
+                        git checkout lesson-db-module
 
                         # Оновлюємо тег у values.yaml
                         cd charts/django-app/
@@ -73,7 +72,7 @@ spec:
                         # Пушимо зміни
                         git add values.yaml
                         git commit -m "chore: update image tag to ${IMAGE_TAG} [skip ci]"
-                        git push origin lesson-4
+                        git push origin lesson-db-module
                         """
                     }
                 }

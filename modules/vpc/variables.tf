@@ -25,6 +25,6 @@ variable "availability_zones" {
 variable "vpc_name" {
   description = "Ім'я VPC"
   type        = string
-  default     = "ruday-lesson-7-vpc-1101"
+  default     = "devOps-vpc"
 }
 

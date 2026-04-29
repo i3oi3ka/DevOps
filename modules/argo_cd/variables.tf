@@ -4,6 +4,17 @@ variable "name" {
   default     = "argo-cd"
 }
 
+variable "django_postgres_host" {
+  description = "PostgreSQL host passed to the Django Helm chart."
+  type        = string
+}
+
+variable "django_postgres_port" {
+  description = "PostgreSQL port passed to the Django Helm chart."
+  type        = number
+  default     = 5432
+}
+
 variable "namespace" {
   description = "K8s namespace для Argo CD"
   type        = string

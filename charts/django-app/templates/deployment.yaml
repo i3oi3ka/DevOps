@@ -11,6 +11,23 @@ spec:
       labels:
         app: {{ .Release.Name }}-django
     spec:
+      {{- if .Values.waitForDatabase.enabled }}
+      initContainers:
+        - name: wait-for-database
+          image: {{ .Values.waitForDatabase.image | quote }}
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-config
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "$POSTGRES_DB"; do
+                echo "Waiting for database at ${POSTGRES_HOST}:${POSTGRES_PORT}..."
+                sleep {{ .Values.waitForDatabase.intervalSeconds }}
+              done
+      {{- end }}
       containers:
         - name: django
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

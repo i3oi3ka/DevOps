@@ -22,7 +22,7 @@ variable "aurora_instance_count" {
 }
 variable "engine_version" {
   type    = string
-  default = "14.7"
+  default = "17.9"
 }
 
 variable "instance_class" {
@@ -49,6 +49,10 @@ variable "password" {
 }
 
 variable "vpc_id" {
+  type = string
+}
+
+variable "vpc_cidr_block" {
   type = string
 }
 
@@ -96,9 +100,9 @@ variable "parameter_group_family_aurora" {
 }
 variable "engine_version_cluster" {
   type    = string
-  default = "15.3"
+  default = "15.8"
 }
 variable "parameter_group_family_rds" {
   type    = string
-  default = "postgres15"
+  default = "postgres17"
 }

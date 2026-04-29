@@ -1,3 +1,13 @@
+moved {
+  from = kubernetes_service_account.jenkins_sa
+  to   = kubernetes_service_account_v1.jenkins_sa
+}
+
+moved {
+  from = kubernetes_secret.github_credentials
+  to   = kubernetes_secret_v1.github_credentials
+}
+
 resource "kubernetes_storage_class_v1" "ebs_sc" {
   metadata {
     name = "ebs-sc"
@@ -16,16 +26,40 @@ resource "kubernetes_storage_class_v1" "ebs_sc" {
   }
 }
 
-resource "kubernetes_service_account" "jenkins_sa" {
+resource "kubernetes_namespace_v1" "jenkins" {
+  metadata {
+    name = "jenkins"
+  }
+}
+
+resource "kubernetes_service_account_v1" "jenkins_sa" {
   metadata {
     name      = "jenkins-sa"
-    namespace = "jenkins"
+    namespace = kubernetes_namespace_v1.jenkins.metadata[0].name
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.jenkins_kaniko_role.arn
     }
   }
   depends_on = [
-    helm_release.jenkins
+    kubernetes_namespace_v1.jenkins
+  ]
+}
+
+resource "kubernetes_secret_v1" "github_credentials" {
+  metadata {
+    name      = "jenkins-github-credentials"
+    namespace = kubernetes_namespace_v1.jenkins.metadata[0].name
+  }
+
+  data = {
+    GITHUB_USERNAME = var.github_username
+    GITHUB_TOKEN    = var.github_token
+  }
+
+  type = "Opaque"
+
+  depends_on = [
+    kubernetes_namespace_v1.jenkins
   ]
 }
 
@@ -77,14 +111,20 @@ resource "aws_iam_role_policy" "jenkins_ecr_policy" {
 
 resource "helm_release" "jenkins" {
   name             = "jenkins"
-  namespace        = "jenkins"
+  namespace        = kubernetes_namespace_v1.jenkins.metadata[0].name
   repository       = "https://charts.jenkins.io"
   chart            = "jenkins"
   version          = "5.9.18"
-  create_namespace = true
+  create_namespace = false
 
   values = [
     file("${path.module}/values.yaml")
+  ]
+
+  depends_on = [
+    kubernetes_storage_class_v1.ebs_sc,
+    kubernetes_service_account_v1.jenkins_sa,
+    kubernetes_secret_v1.github_credentials
   ]
 
 }

@@ -1,19 +1,30 @@
 variable "cluster_name" {
-  description = "Назва Kubernetes кластера"
+  description = "Name of the Kubernetes cluster."
   type        = string
 }
 
 variable "kubeconfig" {
-  description = "Зміст kubeconfig файлу для доступу до EKS кластера"
+  description = "Path or contents used to access the EKS cluster."
   type        = string
 }
 
 variable "oidc_provider_arn" {
-  description = "ARN провайдера OIDC для EKS"
+  description = "OIDC provider ARN for EKS."
   type        = string
 }
 
 variable "oidc_provider_url" {
-  description = "URL провайдера OIDC для EKS"
+  description = "OIDC provider URL for EKS."
   type        = string
+}
+
+variable "github_username" {
+  description = "GitHub username used by Jenkins for repository access."
+  type        = string
+}
+
+variable "github_token" {
+  description = "GitHub token used by Jenkins for repository access."
+  type        = string
+  sensitive   = true
 }

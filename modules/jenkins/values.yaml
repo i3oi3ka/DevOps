@@ -37,6 +37,18 @@ controller:
     name: jenkins-sa
     create: false
 
+  containerEnv:
+    - name: GITHUB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: jenkins-github-credentials
+          key: GITHUB_USERNAME
+    - name: GITHUB_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: jenkins-github-credentials
+          key: GITHUB_TOKEN
+
   JCasC:
     configScripts:
       credentials: |
@@ -60,27 +72,32 @@ controller:
                 scm {
                   git {
                     remote {
-                      url('YOUR_REPO_URL')
+                      url('https://github.com/i3oi3ka/DevOps.git')
                       credentials('github-token')
                     }
-                    branches('*/main')
+                    branches('*/lesson-db-module')
                   }
                 }
                 steps {
                   dsl {
                     text('''
                       pipelineJob("goit-django-docker") {
+                        triggers {
+                          pollSCM("H/5 * * * *")
+                        }
                         definition {
                           cpsScm {
                             scm {
                               git {
                                 remote {
-                                  url("YOUR_REPO_URL")
+                                  url("https://github.com/i3oi3ka/DevOps.git")
                                   credentials("github-token")
                                 }
-                                branches("*/main")
+                                branches("*/lesson-db-module")
                               }
                             }
+                            scriptPath("Jenkinsfile")
+                            lightweight(true)
                           }
                         }
                       }

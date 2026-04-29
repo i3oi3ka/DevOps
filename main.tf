@@ -31,6 +31,10 @@ module "eks" {
   desired_size  = var.desired_size           # Бажана кількість нoдів
   max_size      = var.max_size               # Максимальна кількість нoдів
   min_size      = var.min_size               # Мінімальна кількість нoдів
+
+  depends_on = [
+    module.vpc
+  ]
 }
 
 data "aws_eks_cluster" "eks" {
@@ -62,12 +66,35 @@ provider "kubernetes" {
   token                  = data.aws_eks_cluster_auth.eks.token
 }
 
+moved {
+  from = kubernetes_secret.django_secret
+  to   = kubernetes_secret_v1.django_secret
+}
+
+resource "kubernetes_secret_v1" "django_secret" {
+  metadata {
+    name      = "django-secret"
+    namespace = "default"
+  }
+
+  data = {
+    POSTGRES_DB       = var.db_name
+    POSTGRES_USER     = var.username
+    POSTGRES_PASSWORD = var.password
+    SECRET_KEY        = var.django_secret_key
+  }
+
+  type = "Opaque"
+}
+
 module "jenkins" {
   source            = "./modules/jenkins"
   cluster_name      = module.eks.eks_cluster_name
   oidc_provider_arn = module.eks.oidc_provider_arn
   oidc_provider_url = module.eks.oidc_provider_url
   kubeconfig        = "~/.kube/config"
+  github_username   = var.github_username
+  github_token      = var.github_token
 
   providers = {
     helm       = helm
@@ -81,9 +108,11 @@ module "jenkins" {
 
 
 module "argo_cd" {
-  source        = "./modules/argo_cd"
-  namespace     = var.namespace
-  chart_version = var.chart_version
+  source               = "./modules/argo_cd"
+  namespace            = var.namespace
+  chart_version        = var.chart_version
+  django_postgres_host = module.rds.db_host
+  django_postgres_port = module.rds.db_port
 }
 
 
@@ -93,6 +122,7 @@ module "rds" {
   rds_cluster_name      = var.rds_cluster_name
   use_aurora            = var.use_aurora
   aurora_instance_count = var.aurora_instance_count
+
 
   # --- Aurora-only ---
   engine_cluster                = var.engine_cluster
@@ -114,6 +144,7 @@ module "rds" {
   subnet_public_ids       = module.vpc.public_subnets
   publicly_accessible     = var.publicly_accessible
   vpc_id                  = module.vpc.vpc_id
+  vpc_cidr_block          = var.vpc_cidr_block
   multi_az                = var.multi_az
   backup_retention_period = var.backup_retention_period
   parameters              = var.parameters

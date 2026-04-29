@@ -15,6 +15,17 @@ spec:
         {{- range .source.helm.valueFiles }}
         - {{ . }}
         {{- end }}
+      parameters:
+        {{- range .source.helm.parameters }}
+        - name: {{ .name | quote }}
+          value: {{ .value | quote }}
+        {{- end }}
+        {{- if and (eq .name "django-app") $.Values.djangoApp.postgresHost }}
+        - name: "config.POSTGRES_HOST"
+          value: {{ $.Values.djangoApp.postgresHost | quote }}
+        - name: "config.POSTGRES_PORT"
+          value: {{ $.Values.djangoApp.postgresPort | quote }}
+        {{- end }}
   destination:
     server: {{ .destination.server }}
     namespace: {{ .destination.namespace }}

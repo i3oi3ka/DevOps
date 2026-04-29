@@ -5,7 +5,7 @@ variable "region" {
 
 variable "cluster_name" {
   description = "Name of the EKS cluster"
-  default     = "lesson-7-eks-cluster"
+  default     = "devOps-eks-cluster"
 }
 
 variable "subnet_ids" {
@@ -15,7 +15,7 @@ variable "subnet_ids" {
 
 variable "node_group_name" {
   description = "Name of the node group"
-  default     = "lesson-7-node-group"
+  default     = "devOps-node-group"
 }
 
 variable "instance_type" {
