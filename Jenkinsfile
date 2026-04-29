@@ -29,8 +29,8 @@ spec:
   }
 
   environment {
-    ECR_REGISTRY = "472639102006.dkr.ecr.eu-west-2.amazonaws.com/ruday-lesson-db-ecr-repository"
-    IMAGE_NAME   = "devops-ecr-repository"
+    ECR_REGISTRY = "472639102006.dkr.ecr.eu-west-2.amazonaws.com"
+    IMAGE_NAME   = "ruday-lesson-db-ecr-repository"
     IMAGE_TAG    = "${env.BUILD_NUMBER}"
     REPO_URL     = "github.com/i3oi3ka/DevOps.git"
   }
