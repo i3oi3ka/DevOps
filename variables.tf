@@ -187,6 +187,12 @@ variable "github_token" {
   sensitive   = true
 }
 
+variable "jenkins_admin_password" {
+  description = "Admin password for Jenkins. In production, use a secure method to manage this password, such as Kubernetes secrets or Terraform variables marked as sensitive."
+  type        = string
+  sensitive   = true
+}
+
 variable "publicly_accessible" {
   type    = bool
   default = false

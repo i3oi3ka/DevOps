@@ -120,6 +120,13 @@ resource "helm_release" "jenkins" {
   values = [
     file("${path.module}/values.yaml")
   ]
+  set_sensitive = [
+    {
+      name  = "controller.adminPassword"
+      value = var.jenkins_admin_password
+    }
+  ]
+
 
   depends_on = [
     kubernetes_storage_class_v1.ebs_sc,

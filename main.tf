@@ -92,13 +92,14 @@ resource "kubernetes_secret_v1" "django_secret" {
 }
 
 module "jenkins" {
-  source            = "./modules/jenkins"
-  cluster_name      = module.eks.eks_cluster_name
-  oidc_provider_arn = module.eks.oidc_provider_arn
-  oidc_provider_url = module.eks.oidc_provider_url
-  kubeconfig        = "~/.kube/config"
-  github_username   = var.github_username
-  github_token      = var.github_token
+  source                 = "./modules/jenkins"
+  cluster_name           = module.eks.eks_cluster_name
+  oidc_provider_arn      = module.eks.oidc_provider_arn
+  oidc_provider_url      = module.eks.oidc_provider_url
+  kubeconfig             = "~/.kube/config"
+  github_username        = var.github_username
+  github_token           = var.github_token
+  jenkins_admin_password = var.jenkins_admin_password
 
   providers = {
     helm       = helm

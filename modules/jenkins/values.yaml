@@ -1,7 +1,6 @@
 controller:
   admin:
     username: admin
-    password: admin123
 
   serviceType: LoadBalancer
   servicePort: 80
