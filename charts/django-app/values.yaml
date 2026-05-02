@@ -1,7 +1,7 @@
 image:
   # Must be overridden via an environment-specific values file, `helm --set`, or Terraform-generated values before deployment.
-  repository: "472639102006.dkr.ecr.eu-west-2.amazonaws.com/ruday-lesson-db-ecr-repository"
-  tag: 5
+  repository: "472639102006.dkr.ecr.eu-west-2.amazonaws.com/ruday-final-project-ecr-repository"
+  tag: 1
   pullPolicy: IfNotPresent
 
 service:

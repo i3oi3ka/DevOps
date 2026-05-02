@@ -1,9 +1,11 @@
 resource "helm_release" "grafana" {
-  name            = "grafana"
-  repository      = "https://grafana.github.io/helm-charts"
-  chart           = "grafana"
-  namespace       = "monitoring"
-  cleanup_on_fail = true
+  name             = "grafana"
+  repository       = "https://grafana.github.io/helm-charts"
+  chart            = "grafana"
+  namespace        = "monitoring"
+  create_namespace = true
+  cleanup_on_fail  = true
+  version          = "8.0.0"
 
   set = [
     {
