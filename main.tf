@@ -177,7 +177,6 @@ module "rds" {
 }
 
 module "monitoring" {
-  source                    = "./modules/monitoring"
-  grafana_admin_password    = var.grafana_admin_password
-  prometheus_admin_password = var.prometheus_admin_password
+  source                 = "./modules/monitoring"
+  grafana_admin_password = var.grafana_admin_password
 }

@@ -18,10 +18,4 @@ resource "helm_release" "prometheus" {
       value = "false"
     }
   ]
-  set_sensitive = [
-    {
-      name  = "adminPassword"
-      value = var.prometheus_admin_password
-    }
-  ]
 }
