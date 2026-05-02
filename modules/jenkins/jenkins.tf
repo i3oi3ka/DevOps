@@ -122,7 +122,7 @@ resource "helm_release" "jenkins" {
   ]
   set_sensitive = [
     {
-      name  = "controller.adminPassword"
+      name  = "controller.admin.password"
       value = var.jenkins_admin_password
     }
   ]

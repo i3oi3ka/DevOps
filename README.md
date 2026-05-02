@@ -279,8 +279,8 @@ kubectl get svc -n argocd argocd-server -o jsonpath='{.status.loadBalancer.ingre
 - `public_subnets`: Список публічних підмереж.
 - `private_subnets`: Список приватних підмереж.
 - `internet_gateway_id`: Ідентифікатор інтернет-шлюзу.
-- `eks_cluster_endpoint`: URL-адреса API сервера EKS.
-- `eks_cluster_name`: Ім'я кластера EKS.
+- `cluster_endpoint`: URL-адреса API сервера EKS.
+- `cluster_name`: Ім'я кластера EKS.
 - `eks_node_role_arn`: ARN ролі для вузлів EKS.
 - `ecr_repository_url`: URL вашого ECR репозиторію.
 - `jenkins_release`: Назва релізу Jenkins.

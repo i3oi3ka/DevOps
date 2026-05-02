@@ -34,14 +34,14 @@ output "internet_gateway_id" {
 
 #-------------EKS-----------------
 
-output "eks_cluster_endpoint" {
+output "cluster_endpoint" {
   description = "EKS API endpoint for connecting to the cluster"
-  value       = module.eks.eks_cluster_endpoint
+  value       = module.eks.cluster_endpoint
 }
 
-output "eks_cluster_name" {
+output "cluster_name" {
   description = "Name of the EKS cluster"
-  value       = module.eks.eks_cluster_name
+  value       = module.eks.cluster_name
 }
 
 output "eks_node_role_arn" {
@@ -90,4 +90,16 @@ output "postgres_port" {
 output "postgres_endpoint" {
   description = "PostgreSQL endpoint with port."
   value       = module.rds.db_endpoint
+}
+
+# ---------------monitoring-----------------
+
+output "grafana_url" {
+  description = "Grafana URL"
+  value       = module.monitoring.grafana_url
+}
+
+output "prometheus_url" {
+  description = "Prometheus URL"
+  value       = module.monitoring.prometheus_url
 }

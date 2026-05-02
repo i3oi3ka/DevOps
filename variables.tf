@@ -86,7 +86,7 @@ variable "desired_size" {
 
 variable "max_size" {
   description = "Maximum number of worker nodes"
-  default     = 3
+  default     = 4
 }
 
 variable "min_size" {
@@ -238,3 +238,16 @@ variable "parameter_group_family_rds" {
   type    = string
   default = "postgres17"
 }
+
+# --- Змінні для моніторингу ---
+variable "grafana_admin_password" {
+  description = "The password for the Grafana admin user"
+  type        = string
+  sensitive   = true
+}
+variable "prometheus_admin_password" {
+  description = "The password for the Prometheus admin user"
+  type        = string
+  sensitive   = true
+}
+

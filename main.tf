@@ -38,14 +38,14 @@ module "eks" {
 }
 
 data "aws_eks_cluster" "eks" {
-  name = module.eks.eks_cluster_name
+  name = module.eks.cluster_name
   depends_on = [
     module.eks
   ]
 }
 
 data "aws_eks_cluster_auth" "eks" {
-  name = module.eks.eks_cluster_name
+  name = module.eks.cluster_name
   depends_on = [
     module.eks
   ]
@@ -64,6 +64,14 @@ provider "kubernetes" {
   host                   = data.aws_eks_cluster.eks.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.eks.token
+}
+
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_name
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
 }
 
 moved {
@@ -87,13 +95,15 @@ resource "kubernetes_secret_v1" "django_secret" {
   type = "Opaque"
 
   depends_on = [
+    module.eks,
+    module.rds,
     module.argo_cd
   ]
 }
 
 module "jenkins" {
   source                 = "./modules/jenkins"
-  cluster_name           = module.eks.eks_cluster_name
+  cluster_name           = module.eks.cluster_name
   oidc_provider_arn      = module.eks.oidc_provider_arn
   oidc_provider_url      = module.eks.oidc_provider_url
   kubeconfig             = "~/.kube/config"
@@ -160,4 +170,8 @@ module "rds" {
   }
 }
 
-
+module "monitoring" {
+  source                    = "./modules/monitoring"
+  grafana_admin_password    = var.grafana_admin_password
+  prometheus_admin_password = var.prometheus_admin_password
+}
