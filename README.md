@@ -90,7 +90,7 @@
 
 ---
 
-### Приклад конфігурації `terraform.tfvars`:
+### Приклад конфігурації `terraform.tfvars:`
 
 Створіть цей файл у кореневій директорії проєкту, щоб передати власні значення:
 
@@ -148,10 +148,12 @@ password           = "SuperSecretPassword123!"
 
 1. Закоментуйте весь вміст файлу `backend.tf`.
 2. Виконайте ініціалізацію та створення ресурсів:
+
    ```bash
    terraform init
    terraform apply
    ```
+
 3. Розкоментуйте `backend.tf`, впишіть туди назву створеного бакету та таблиці DynamoDB.
 4. Виконайте `terraform init` ще раз і погодьтеся на міграцію стейту в AWS (`yes`).
 5. Знову виконайте `terraform apply` для завершення розгортання всієї інфраструктури.
@@ -187,9 +189,11 @@ kubectl get svc -n argocd argocd-server -o jsonpath='{.status.loadBalancer.ingre
 
 - **Логін**: `admin`
 - **Пароль**: Отримайте з кластера командою:
+
   ```bash
   kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
   ```
+
   ![Argo CD UI](screenshots/argocd.png)
 
 ## 🔄 Як працює автоматизація (CI/CD Workflow)
