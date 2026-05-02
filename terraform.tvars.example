@@ -13,7 +13,6 @@ github_username   =
 github_token      = 
 jenkins_admin_password = 
 grafana_admin_password   = 
-prometheus_admin_password =
 instance_class          = 
 multi_az                = 
 backup_retention_period = 
