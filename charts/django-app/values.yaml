@@ -1,6 +1,6 @@
 image:
   # Must be overridden via an environment-specific values file, `helm --set`, or Terraform-generated values before deployment.
-  repository: "472639102006.dkr.ecr.eu-west-2.amazonaws.com/ruday-final-project-ecr-repository"
+  repository: "your_ecr_repo/django-app"
   tag: 1
   pullPolicy: IfNotPresent
 
@@ -13,6 +13,7 @@ ingress:
   enabled: false
 
 config:
+  DEBUG: "False"
   POSTGRES_HOST: ""
   POSTGRES_PORT: "5432"
 
